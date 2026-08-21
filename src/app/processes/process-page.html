@@ -1,0 +1,130 @@
+<header class="head">
+  <h1>{{ title() }}</h1>
+  <div class="actions">
+    <qits-button [busy]="starting()" (pressed)="start(false)">Run now</qits-button>
+    <qits-button variant="secondary" [busy]="starting()" (pressed)="start(true)"
+      >Dry run</qits-button
+    >
+  </div>
+</header>
+
+@if (description(); as text) {
+  <p class="lede">{{ text }}</p>
+}
+
+<app-async
+  [state]="processState()"
+  loadingLabel="Loading the process"
+  errorLabel="Could not load the process"
+  (retry)="loadProcess()"
+/>
+
+@if (startNote(); as note) {
+  <p class="page-error" role="alert">{{ note }}</p>
+}
+
+<h2>Runs</h2>
+
+<app-async
+  [state]="runsState()"
+  loadingLabel="Loading the runs"
+  errorLabel="Could not load the runs"
+  (retry)="loadRuns()"
+/>
+
+@if (runsState().kind === 'ready') {
+  @if (runs().length === 0) {
+    <app-empty
+      message="This process has never run here. Run now starts it; Dry run does everything except the deletions."
+    />
+  } @else {
+    <div class="scroll">
+      <table>
+        <caption>
+          {{
+            caption()
+          }}, newest first. Pick one to see its steps.
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Status</th>
+            <th scope="col">Started</th>
+            <th scope="col">Trigger</th>
+            <th scope="col">Summary</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (run of runs(); track run.id) {
+            <tr
+              class="run-row"
+              [class.run-row-current]="run.id === currentRunId()"
+              [attr.aria-current]="run.id === currentRunId() ? 'true' : null"
+            >
+              <td><app-status-badge [status]="run.status" /></td>
+              <td>
+                <!-- The button is the row's one focus stop and its whole affordance: a row that
+                     only answered a click would be unreachable from a keyboard, and the started
+                     time is the label an operator picks a run by. -->
+                <button type="button" class="run-pick" (click)="selectRun(run.id)">
+                  {{ instant(run.startedAt) }}
+                </button>
+              </td>
+              <td>
+                {{ run.trigger }}
+                @if (run.dryRun) {
+                  <qits-badge label="dry run" tone="info" />
+                }
+              </td>
+              <td class="value">{{ run.summary || none }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+}
+
+<h2>Steps</h2>
+
+<app-async
+  [state]="runState()"
+  loadingLabel="Loading the run"
+  errorLabel="Could not load the run"
+  (retry)="reloadRun()"
+/>
+
+@if (pollProblem(); as problem) {
+  <p class="stale" role="status">
+    The last update did not arrive — {{ problem }}. This is the run as it was last read.
+  </p>
+}
+
+@if (run(); as current) {
+  <p class="run-facts">
+    <app-status-badge [status]="current.status" />
+    <span>{{ current.trigger }}</span>
+    @if (current.dryRun) {
+      <qits-badge label="dry run" tone="info" />
+    }
+    <span class="subtle">started {{ instant(current.startedAt) }}</span>
+    <span class="subtle mono">{{ current.id }}</span>
+  </p>
+
+  @if (current.steps.length === 0) {
+    <app-empty message="This run recorded no steps." />
+  } @else {
+    <app-flow-board
+      [steps]="current.steps"
+      [selectedStepId]="selectedStepId()"
+      (stepPicked)="selectStep($event)"
+    />
+
+    @if (selectedStep(); as step) {
+      <app-step-detail [step]="step" />
+    } @else {
+      <p class="note">Pick a card to see the request it made and the answer it got.</p>
+    }
+  }
+} @else if (runState().kind === 'idle') {
+  <app-empty message="No run to show yet." />
+}
