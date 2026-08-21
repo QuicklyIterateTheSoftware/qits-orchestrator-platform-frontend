@@ -1,0 +1,135 @@
+/* The board: columns of cards with the dependency wires drawn underneath them.
+
+   The scroll is horizontal and belongs to the board rather than the page: gc is nine steps in five
+   columns, and a narrow window must move the board sideways without moving the run list and the
+   detail panel with it. */
+
+:host {
+  display: block;
+}
+
+.board {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 3rem;
+  overflow-x: auto;
+  padding: 0.25rem 0.25rem 0.75rem;
+}
+
+/* Under the cards, and pinned to the board's own coordinate space — which is why the metrics are
+   measured board-relative and corrected for its scroll. Absolute rather than a background so it
+   covers the gaps between columns, where every line actually runs. */
+.wires {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.wire {
+  fill: none;
+  stroke: #94a3b8;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.slot {
+  /* Wide enough for the longest step id the gc process declares —
+     `containers.build-cache` — beside its badge, because a name broken mid-word is a name an
+     operator has to reassemble before they can match it to the process definition. */
+  width: 18rem;
+}
+
+.card {
+  border-left: 5px solid #9ca3af;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.card:focus-visible {
+  outline: 2px solid #1f2937;
+  outline-offset: 2px;
+}
+
+.card-selected {
+  outline: 2px solid #1f2937;
+  outline-offset: 1px;
+}
+
+/* The one thing that separates a step waiting for its dependency from a step in flight: both are
+   the warning tone (see ui/status-tone.ts), so the difference is motion rather than colour. The
+   yellow is spelled again here because a keyframe cannot read a bound style property. */
+.card-running {
+  animation: card-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes card-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(234, 179, 8, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-running {
+    animation: none;
+    box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.5);
+  }
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-name {
+  font-weight: 600;
+  overflow-wrap: break-word;
+}
+
+.card-line {
+  display: flex;
+  gap: 0.5rem;
+  margin: 0.15rem 0;
+  font-size: 0.85rem;
+}
+
+.card-label {
+  flex: none;
+  width: 3.6rem;
+  color: #6b7280;
+}
+
+/* A path can be long and there is no room for it; the detail panel shows the URL whole. */
+.card-call {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-summary {
+  margin: 0.5rem 0;
+  font-size: 0.88rem;
+  overflow-wrap: anywhere;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}

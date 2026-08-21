@@ -1,0 +1,52 @@
+/* What this page adds to the shared page furniture: the two action buttons in the heading, the run
+   list's selection, and the run's own fact line above the board. */
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+h2 {
+  margin: 1.5rem 0 0.35rem;
+  font-size: 1rem;
+}
+
+/* The pick control looks like a link because that is what it does — it changes what the page is
+   showing — while staying a button, because it goes to no address. */
+.run-pick {
+  font: inherit;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #4338ca;
+  cursor: pointer;
+  text-align: left;
+}
+
+.run-pick:hover {
+  text-decoration: underline;
+}
+
+.run-row-current {
+  background: #f3f4f6;
+}
+
+.run-row-current .run-pick {
+  font-weight: 600;
+}
+
+.run-facts {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin: 0.5rem 0 0.75rem;
+}
+
+/* A poll that did not answer leaves the last good run on screen and says so here. Blanking the
+   board because one request out of a hundred timed out would lose more than it tells. */
+.stale {
+  margin: 0.5rem 0;
+  color: #b45309;
+  font-size: 0.9rem;
+}

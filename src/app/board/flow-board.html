@@ -1,0 +1,59 @@
+<div class="board" #board>
+  <!-- The wires are drawn under the cards and are decoration: every dependency they show is also
+       written on the card itself, in the detail panel, so a reader who cannot see the lines loses
+       nothing. Hence aria-hidden, and hence no focus stop anywhere in here. -->
+  <svg
+    class="wires"
+    [attr.width]="size().width"
+    [attr.height]="size().height"
+    [attr.viewBox]="'0 0 ' + size().width + ' ' + size().height"
+    aria-hidden="true"
+    focusable="false"
+  >
+    @for (wire of wires(); track wire.key) {
+      <polyline class="wire" [attr.points]="wire.points" />
+    }
+  </svg>
+
+  @for (column of columns(); track $index) {
+    <div class="column">
+      @for (step of column; track step.id) {
+        <div class="slot" [attr.data-step-id]="step.id">
+          <!-- A div with the button role rather than a <button>, because the card it wraps carries
+               a heading and a definition list, and neither survives being nested in a button. -->
+          <div
+            class="card"
+            role="button"
+            tabindex="0"
+            [class.card-selected]="step.id === selectedStepId()"
+            [class.card-running]="step.status === 'RUNNING'"
+            [style.borderLeftColor]="colour(step.status)"
+            [attr.aria-pressed]="step.id === selectedStepId()"
+            (click)="pick(step.id)"
+            (keydown)="onKey($event, step.id)"
+          >
+            <qits-card>
+              <div class="card-head">
+                <span class="card-name">{{ step.name }}</span>
+                <app-status-badge [status]="step.status" />
+              </div>
+              <p class="card-line">
+                <span class="card-label">Target</span>
+                <span>{{ step.target }}</span>
+              </p>
+              <p class="card-line mono">
+                <span class="card-label">Call</span>
+                <span class="card-call">{{ call(step) }}</span>
+              </p>
+              <p class="card-summary">{{ step.summary || none }}</p>
+              <p class="card-line">
+                <span class="card-label">Took</span>
+                <span>{{ duration(step) }}</span>
+              </p>
+            </qits-card>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
