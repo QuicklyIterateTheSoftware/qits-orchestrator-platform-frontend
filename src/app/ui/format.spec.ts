@@ -51,6 +51,8 @@ describe('format', () => {
   it('pretty-prints a body, and passes a string through as it is', () => {
     expect(prettyJson({ dryRun: true })).toBe('{\n  "dryRun": true\n}');
     expect(prettyJson('plain text')).toBe('plain text');
+    expect(prettyJson('{"a":1}')).toBe('{\n  "a": 1\n}');
+    expect(prettyJson('{"a":1 …truncated')).toBe('{"a":1 …truncated');
     expect(prettyJson(null)).toBe('');
     expect(prettyJson(undefined)).toBe('');
   });

@@ -118,7 +118,13 @@ export function prettyJson(value: unknown): string {
     return '';
   }
   if (typeof value === 'string') {
-    return value;
+    // The service stores a peer's body as a string (a 1 MiB-truncated body is not JSON). Pretty-print
+    // it when it still parses; show it as it came otherwise.
+    try {
+      return JSON.stringify(JSON.parse(value), null, 2);
+    } catch {
+      return value;
+    }
   }
   try {
     return JSON.stringify(value, null, 2);
