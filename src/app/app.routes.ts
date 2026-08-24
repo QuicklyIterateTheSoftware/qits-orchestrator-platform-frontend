@@ -17,9 +17,15 @@ import { NotFound } from './not-found/not-found';
  * is also the only place that can say "the service could not be reached" instead of bouncing to a
  * URL that will fail the same way.
  *
- * **The path shape repeats the API's, noun for noun.** `/orchestrator/processes/gc` is the page for
- * what `GET /orchestrator/api/processes/gc/runs` answers. A bare kind under the base href would
- * have read better once and then swallowed every future top-level route.
+ * **The path shape repeats the API's, noun for noun.** `/processes/gc` is the page for what `GET
+ * /orchestrator/api/processes/gc/runs` answers. A bare kind would have read better once and then
+ * swallowed every future top-level route.
+ *
+ * **Every address here starts at the root**, because this application is served at `/` on its own
+ * host. It is a `system` app: its pages are about the platform's housekeeping rather than about one
+ * project, so it has no `/<slug>/...` form and adds none — picking a project in the chrome leaves
+ * for qits-projects instead. The API keeps its segment and is path-routed on every host, so the
+ * calls below are unchanged.
  *
  * **A run is not its own address, and that is a decision.** A run belongs to a process and is only
  * ever read beside that process's run list, so the selected run is state on the process page rather
