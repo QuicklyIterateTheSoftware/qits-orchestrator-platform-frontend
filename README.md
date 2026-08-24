@@ -1,13 +1,13 @@
 # QitsPlatformSpaOrchestrator
 
 The orchestrator's frontend: the technical processes the platform runs against itself, and what each
-step of a run actually did. Served by qits-platform-orchestrator at `/orchestrator/` through Quinoa.
-Two routes, both inside the platform chrome.
+step of a run actually did. Served by qits-platform-orchestrator at `/` on
+`orchestrator.<env>.<domain>` through Quinoa. Two routes, both inside the platform chrome.
 
-- **`/orchestrator/`** — every technical process. With one defined it forwards to that one, so today
-  this address is a door rather than a page.
-- **`/orchestrator/processes/<kind>`** — one process: the two start buttons, its recent runs, and the
-  selected run drawn as a board of steps.
+- **`/`** — every technical process. With one defined it forwards to that one, so today this address
+  is a door rather than a page.
+- **`/processes/<kind>`** — one process: the two start buttons, its recent runs, and the selected run
+  drawn as a board of steps.
 
 There is one process today, **`gc`** — the unified deletion run across the platform.
 
@@ -74,13 +74,17 @@ Two things the service must honour that the JSON shape alone does not say:
 ## How it is served
 
 qits-platform-orchestrator carries this repository as a git submodule at `service/src/main/webui` —
-Quinoa's ui-dir — and builds it during `mvn package`, serving the bundle at `/orchestrator/`. The
-segment is spelled here as `baseHref` in `angular.json` and there as `quarkus.quinoa.ui-root-path`;
-the two move together, and a disagreement serves a page whose every asset 404s. This repository
-ships no container image of its own.
+Quinoa's ui-dir — and builds it during `mvn package`, serving the bundle at `/`. The root is spelled
+here as `baseHref` in `angular.json` and there as `quarkus.quinoa.ui-root-path`; the two move
+together, and a disagreement serves a page whose every asset 404s. This repository ships no container
+image of its own.
 
-Note the known wart, which is every client's alike: bare `/orchestrator` (no trailing slash) is a
-404. `/orchestrator/` works.
+**This is a `system` app.** Its pages are about the platform's own housekeeping rather than about one
+project, so it routes no `/<projectSlug>/...` form — `provideQitsScope('system')` in `app.config.ts`
+says so, and picking a project in the chrome's picker leaves for qits-projects instead of rewriting
+an address this app does not serve. The API keeps its `/orchestrator` segment and is path-routed on
+every host, so the calls above are unchanged. The old bare-`/orchestrator` trailing-slash wart went
+with the move to the root.
 
 ## Development server
 
@@ -88,11 +92,12 @@ Note the known wart, which is every client's alike: bare `/orchestrator` (no tra
 ng serve
 ```
 
-Then open `http://localhost:4200/orchestrator/`. `proxy.conf.json` forwards `/orchestrator/api` and
-`/orchestrator/q` to a gateway on `localhost:8080`, because `ng serve` puts no gateway in front.
+Then open `http://localhost:4200/`. `proxy.conf.json` forwards `/orchestrator/api`,
+`/orchestrator/q`, `/projects/api` and `/main-navigation` to an edge on `localhost:8080`, because
+`ng serve` puts none in front.
 
-The platform chrome asks the gateway for `/main-navigation`, which `ng serve` does not proxy — so
-the sidebar renders "Navigation unavailable". That is the intended degraded state, not a fault.
+With no edge answering `/main-navigation` the sidebar renders "Navigation unavailable". That is the
+intended degraded state, not a fault.
 
 ## Running the checks
 
