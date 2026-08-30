@@ -1,4 +1,4 @@
-# QitsPlatformSpaOrchestrator
+# qits-orchestrator-platform-frontend
 
 The orchestrator's frontend: the technical processes the platform runs against itself, and what each
 step of a run actually did. Served by qits-platform-orchestrator at `/` on
@@ -73,8 +73,9 @@ Two things the service must honour that the JSON shape alone does not say:
 
 ## How it is served
 
-qits-platform-orchestrator carries this repository as a git submodule at `service/src/main/webui` —
-Quinoa's ui-dir — and builds it during `mvn package`, serving the bundle at `/`. The root is spelled
+qits-orchestrator-platform-service — the repository behind the qits-platform-orchestrator
+application — carries this repository as a git submodule at `service/src/main/webui` — Quinoa's
+ui-dir — and builds it during `mvn package`, serving the bundle at `/`. The root is spelled
 here as `baseHref` in `angular.json` and there as `quarkus.quinoa.ui-root-path`; the two move
 together, and a disagreement serves a page whose every asset 404s. This repository ships no container
 image of its own.
