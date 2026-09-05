@@ -1,6 +1,6 @@
 {
   "name": "qits-platform-spa-orchestrator",
-  "version": "2026.904.204115",
+  "version": "2026.905.32700",
   "private": true,
   "description": "The orchestrator's frontend: an Angular application that consumes @qits/ui-components from qits' own npm registry. It ships no image — qits-platform-orchestrator serves it via Quinoa at the root of its own host.",
   "license": "MIT",
